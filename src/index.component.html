@@ -2,6 +2,10 @@
 <div style="text-align:center">
   <h1>
     <input [(ngModel)]="textInput"><br />
-    {{ textInput }}
+    {{ textInput }}<br />
+    <input [(ngModel)]="hero.name" placeholder="name"><br />
+    {{ hero.name }}
   </h1>
 </div>
+<!-- ルータ配置用のテンプレート -->
+<router-outlet></router-outlet>

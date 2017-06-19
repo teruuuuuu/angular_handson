@@ -215,7 +215,7 @@ export class AppModule { }
 ```
 それからindex.component.tsとindex.component.htmlでコンポーネント内のクラス変数をbindさせてみます。
 index.component.ts
-```
+```javascript
 import { Component } from '@angular/core';
 
 @Component({
@@ -228,7 +228,7 @@ export class AppComponent {
 }
 ```
 index.component.html
-```
+```html
 <!--The whole content below can be removed with the new code.-->
 <div style="text-align:center">
   <h1>
@@ -238,3 +238,259 @@ index.component.html
 </div>
 ```
 これで実際に動かしてみると画面にコンポーネントのクラス変数が表示され、またinputタグへ入力を行いbindしている変数を変更すると値自体が変更され表示にも反映されるのが確認できます。
+
+### ルータとサービスを使ってみる
+angularのルータとサービスを利用してみたいと思います。angularのルータにより表示するコンポーネントを切り替えたりURLパラメータを受け取った処理ができるようになります。サービスはAPIを投げてデータを取得したりとか、コンポーネント間で共有するデータとかデータに関する操作とかを記述します。
+まずルータを足してみます。
+app/router/app.router.ts   
+```javascript
+import { NgModule } from '@angular/core';
+import { Routes, RouterModule } from '@angular/router';
+
+import { HeroDetailComponent } from 'app/component/heroDetail/hero.detail.component';
+
+// コンポーネントとURLを関連づける
+const routes: Routes = [
+  { path: '', redirectTo: '/detail/1', pathMatch: 'full' },
+  // URLパラメータをコンポーネントに渡すようにしている
+  { path: 'detail/:id', component: HeroDetailComponent },
+];
+
+@NgModule({
+  imports: [RouterModule.forRoot(routes)],
+  exports: [RouterModule]
+})
+export class AppRoutingModule { }
+```
+ルータではURLとコンポーネントのマッピングを行います。
+
+
+app/service/hero.service.ts
+```javascript
+import { Injectable } from '@angular/core';
+
+import { Hero } from 'app/model/Hero';
+import { HEROES } from 'app/mock/heros.mock';
+
+
+
+@Injectable()
+export class HeroService {
+
+  getHeroes(): Promise<Hero[]> {
+    console.log("hero service getHeros");
+    console.info(HEROES); // 2wayバインドによりmockオブジェクト自体が変更されていることが確認できる
+    return Promise.resolve(HEROES);
+  }
+
+  getHeroesSlowly(): Promise<Hero[]> {
+    return new Promise(resolve => {
+      // Simulate server latency with 2 second delay
+      setTimeout(() => resolve(this.getHeroes()), 2000);
+    });
+  }
+
+  // id指定でデータ取得
+  getHeroById(id: number): Promise<Hero> {
+    return this.getHeroes()
+      .then(heroes => heroes.find(hero => hero.id === id));
+  }
+}
+```
+サービスはインポートしたHEROESオブジェクトをPromiseにより非同期でレスポンスとして返す処理を行います。今回使用しているモック用のオブジェクトは以下のようになっています。
+app/mock/heros.mock.ts
+```javascript
+import { Hero } from 'app/model/Hero';
+
+export const HEROES: Hero[] = [
+  { id: 1, name: 'Mr. Nick' },
+  { id: 11, name: 'Mr. Nice' },
+  { id: 12, name: 'Narco' },
+  { id: 13, name: 'Bombasto' },
+  { id: 14, name: 'Celeritas' },
+  { id: 15, name: 'Magneta' },
+  { id: 16, name: 'RubberMan' },
+  { id: 17, name: 'Dynama' },
+  { id: 18, name: 'Dr IQ' },
+  { id: 19, name: 'Magma' },
+  { id: 20, name: 'Tornado' }
+];
+```
+それと、Heroの型は以下のようになっています。
+app/model/Hero.ts
+```javascript
+export class Hero {
+  id: number;
+  name: string;
+}
+```
+
+次にルータとサービスをモジュールとして使えるようにコンポーネントに読み込ませます。
+main.module.ts
+```javascript
+import { BrowserModule } from '@angular/platform-browser';
+import { NgModule } from '@angular/core';
+import { FormsModule } from '@angular/forms'; //テンプレートでバインディングしたり、validationするのに必要
+
+import { AppComponent } from 'index.component';
+import { HeroDetailComponent } from 'app/component/heroDetail/hero.detail.component';
+
+import { HeroService } from 'app/service/hero.service';
+import { AppRoutingModule } from 'app/router/app.router';
+
+@NgModule({
+  imports: [
+    AppRoutingModule, // 注意 ルータはdeclationではなくimportsにたす
+    BrowserModule,
+    FormsModule
+  ],
+  declarations: [
+    AppComponent,
+    HeroDetailComponent
+  ],
+  providers: [
+    HeroService // サービスはprovidersに追加する
+  ],
+  bootstrap: [AppComponent]
+})
+export class AppModule { }
+```
+
+次にルータとサービスで使用するHeroDetailComponentを追加してみたいと思います。    
+app/component/heroDetail/hero.detail.component.ts
+```javascript
+import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute, Params } from '@angular/router';
+
+import { Hero } from 'app/model/Hero';
+import { HeroService } from 'app/service/hero.service';
+
+
+@Component({
+  selector: 'hero-detail', //ディレクティブのタグ名
+  templateUrl: './hero.detail.component.html' //htmlテンプレートの読み込み
+})
+export class HeroDetailComponent implements OnInit {
+  // テンプレートhtmlにbindして使用するクラス変数
+  title = 'HeroDetail';
+  hero: Hero = new Hero();
+
+  // コンポーネントを使用する側で用途を決めれるようにする
+  isSearchMode: Boolean = true;
+
+
+  constructor(
+    private heroService: HeroService,
+    // urlパラメータを取得するのに必要
+    private route: ActivatedRoute) {
+  }
+
+  ngOnInit(): void {
+    if(this.isSearchMode){
+      // ルータからパラメータ取得
+      this.route.params.forEach((params: Params) => {
+        console.log("hero detail component ngOnInit");
+        console.info(params);
+        if (params['id'] !== undefined) {
+          const id = +params['id'];
+          this.heroService.getHeroById(id)
+              .then(hero => this.hero = hero);
+        }
+      });
+    }
+  }
+}
+```
+app/component/heroDetail/hero.detail.component.html
+```javascript
+<!-- heroが見つかった時のみこの部分を表示する-->
+<div *ngIf="hero">
+  <h1>{{title}}</h1>
+  <h2>{{hero.name}} details!</h2>
+  <div><label>id: </label>{{hero.id}}</div>
+  <div>
+    <label>name: </label>
+    <!-- 注意 ngMoelを使う場合はNgModuleでFormsModuleをインポートしないといけない-->
+    <input [(ngModel)]="hero.name" placeholder="name">
+  </div>
+</div>
+
+<!-- heroが見つからなかった場合の処理 -->
+<div *ngIf="!hero">
+  hero not found.
+</div>
+```
+
+app/component/heroDetail/hero.detail.component.css
+```css
+h1 {
+  color: #369;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 250%;
+}
+```
+
+それから、ルータのディレクティブをhtmlテンプレートに追加して使用できるようにします。
+index.component.html
+```html
+<!--The whole content below can be removed with the new code.-->
+<div style="text-align:center">
+  <h1>
+    <input [(ngModel)]="textInput"><br />
+    {{ textInput }}<br />
+</div>
+<!-- ルータ配置用のテンプレート -->
+<router-outlet></router-outlet>
+```
+これで動かしてみると'http://localhost:4200'のアクセスは'http://localhost:4200/detail/1'にリダイレクトされid=1のユーザが表示されるはずです。idの部分のパラメータを変更することで表示するユーザが切り替わることが確認できます。
+
+### 別コンポーネントでも同一のサービスを使ってみる
+別コンポーネントで同一のサービスを利用し2way-bindingによりサービス館でデータが共有されていることを確認します。
+まず今回使用するサービスに以下のメソッドを追加します。先に追加している非同期の処理でも大丈夫ですが今回は既にサービスコンポーネントで保有されているデータを返す処理を追加したく非同期である必要はなさそうなのでそれ用のメソッドを追加しています。
+```javascript
+// データ共有をするだけの用途とかでPromiseを使わないこともできる
+getSyncHero(id: number): Hero {
+  return HEROES.find(hero => hero.id === id);
+}
+```
+それから、以下のように既存のindex.component.tsでサービスを利用するように変更します。
+index.component.ts
+```javascript
+import { Component, OnInit } from '@angular/core';
+
+import { Hero } from 'app/model/Hero';
+import { HeroService } from 'app/service/hero.service';
+
+@Component({
+  selector: 'app-root',
+  templateUrl: './index.component.html',
+  styleUrls: ['./index.component.css']
+})
+export class AppComponent implements OnInit {
+  textInput = "input test";
+  hero: Hero = new Hero();
+
+  constructor(
+    private heroService: HeroService) {
+  }
+
+  ngOnInit(): void {
+    this.hero = this.heroService.getSyncHero(1);
+  }
+}
+```
+index.component.html
+```
+<!--The whole content below can be removed with the new code.-->
+<div style="text-align:center">
+  <h1>
+    <input [(ngModel)]="textInput"><br />
+    {{ textInput }}<br />
+    <input [(ngModel)]="hero.name" placeholder="name"><br />
+    {{ hero.name }}
+  </h1>
+</div>
+<!-- ルータ配置用のテンプレート -->
+<router-outlet></router-outlet>
+```
+これでindex.componentにもHeroの情報が表示され、またそれぞれのinputに対して入力すると即時で反映されることが確認できます。
