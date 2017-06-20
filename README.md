@@ -792,3 +792,51 @@ goBack(savedHero: Hero = null): void {
 </div>
 ```
 これでコンポーネント間での画面繊維が確認できたかと思います。
+
+
+### もう一つコンポーネントを追加してみる
+次にダッシュボードコンポーネントを追加して、こちらからもhero.detail.compnentに遷移できるようにしたいと思います。
+以下のapp/component/dashboard/dashboard.component.tsを作成します。
+```javascript
+import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
+
+import { Hero } from 'app/model/Hero';
+import { HeroService } from 'app/service/hero.service';
+
+@Component({
+  selector: 'my-dashboard',
+  templateUrl: './dashboard.component.html',
+  styleUrls: ['./dashboard.component.css']
+})
+export class DashboardComponent implements OnInit {
+  heroes: Hero[] = [];
+
+  constructor(
+    private router: Router,
+    private heroService: HeroService) {
+  }
+
+  ngOnInit(): void {
+    this.heroService.getHeroes()
+      .then(heroes => this.heroes = heroes.slice(1, 6));
+  }
+
+  gotoDetail(hero: Hero): void {
+    const link = ['/detail', hero.id];
+    this.router.navigate(link);
+  }
+}
+```
+それからhtmlテンプレートを作成します。
+```html
+<div class="grid grid-pad">
+  <h3>Top Heroes</h3>
+  <div *ngFor="let hero of heroes" (click)="gotoDetail(hero)"  class="col-1-4">
+    <div class="module hero">
+      <h4>{{hero.name}}</h4>
+    </div>
+  </div>
+</div>
+```
+あとはmain.module.tsでDashboardComponentを読み込むようにし、ルータに追加しておくと画面が表示されるようになります。

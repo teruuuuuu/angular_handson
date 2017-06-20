@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms'; //テンプレートでバイン�
 import { AppComponent } from 'index.component';
 import { HeroDetailComponent } from 'app/component/heroDetail/hero.detail.component';
 import { HeroListComponent } from 'app/component/heroList/hero.list.component';
+import { DashboardComponent } from 'app/component/dashboard/dashboard.component';
 
 import { HeroService } from 'app/service/hero.service';
 import { AppRoutingModule } from 'app/router/app.router';
@@ -18,7 +19,8 @@ import { AppRoutingModule } from 'app/router/app.router';
   declarations: [
     AppComponent,
     HeroDetailComponent,
-    HeroListComponent
+    HeroListComponent,
+    DashboardComponent
   ],
   providers: [
     HeroService
