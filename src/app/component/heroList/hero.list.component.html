@@ -6,3 +6,6 @@
       <span class="badge">{{hero.id}}</span> {{hero.name}}</span>
   </li>
 </ul>
+
+<!-- コンポーネントのメンバ変数を[]で囲ったものに対して選択したheroを渡す -->
+<hero-detail [hero]="selectedHero" [isSearchMode]="false"></hero-detail>

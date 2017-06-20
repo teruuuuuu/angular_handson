@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { ActivatedRoute, Params } from '@angular/router';
 
 import { Hero } from 'app/model/Hero';
@@ -12,10 +12,10 @@ import { HeroService } from 'app/service/hero.service';
 export class HeroDetailComponent implements OnInit {
   // テンプレートhtmlにbindして使用するクラス変数
   title = 'HeroDetail';
-  hero: Hero = new Hero();
+  @Input()  hero: Hero = new Hero();
 
   // コンポーネントを使用する側で用途を決めれるようにする
-  isSearchMode: Boolean = true;
+  @Input()  isSearchMode: Boolean = true;
 
 
   constructor(
