@@ -494,3 +494,189 @@ index.component.html
 <router-outlet></router-outlet>
 ```
 これでindex.componentにもHeroの情報が表示され、またそれぞれのinputに対して入力すると即時で反映されることが確認できます。
+
+
+### htmlテンプレートでループ処理をする
+次にhtmlテンプレート内でループを回して描画を行ってみたいと思います。リストの情報を取得する以下のコンポーネントを追加します。    
+app/component/heroList/hero.list.component.ts
+```javascript
+import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
+
+import { Hero } from 'app/model/Hero';
+import { HeroService } from 'app/service/hero.service';
+
+
+@Component({
+  selector: 'hero-list',
+  templateUrl: './hero.list.component.html',
+  styleUrls: ['./hero.list.component.css']
+})
+export class HeroListComponent implements OnInit {
+  heroes: Hero[] = [];
+  title = 'HeroesList';
+  selectedHero: Hero;
+
+  // サービスはconstructorに足しておく
+  constructor(
+    private router: Router,
+    private heroService: HeroService) {
+  }
+
+  ngOnInit(): void {
+    // 再描画のたびに呼ばれるので、ここでメンバ変数を初期化
+    console.log("HeroListComponent ngOnInit")
+    this.heroService.getHeroes()
+      .then(heroes => this.heroes = heroes);
+    /*
+    this.heroService.getHeroesSlowly()
+      .then(heroes => this.heroes = heroes);
+      */
+  }
+
+  onSelect(hero: Hero): void {
+    this.selectedHero = hero;
+  }
+}
+```
+それから、htmlテンプレートを作成します。    
+```html
+<h1>{{title}}</h1>
+<h2>My Heroes</h2>
+<ul class="heroes">
+  <li *ngFor="let hero of heroes" (click)="onSelect(hero)" [class.selected]="hero === selectedHero">
+    <span class="hero-element">
+      <span class="badge">{{hero.id}}</span> {{hero.name}}</span>
+  </li>
+</ul>
+```
+上記の<li \*ngFor="let hero of heroes" ~の部分がコンポーネント内のメンバ変数であるheroesをループさせて描画処理を
+行っています。hero === selectedHeroの条件が一致している場合はタグのクラスに"selected"を追加します。    
+それとcssも作成しておきます。    
+
+
+```css
+.selected {
+  background-color: #CFD8DC !important;
+  background-color: rgb(0,120,215) !important;
+  color: white;
+}
+.heroes {
+  margin: 0 0 2em 0;
+  list-style-type: none;
+  padding: 0;
+  width: 15em;
+}
+.heroes li {
+  cursor: pointer;
+  position: relative;
+  left: 0;
+  background-color: #EEE;
+  margin: .5em;
+  padding: .5em;
+  height: 1.6em;
+  border-radius: 4px;
+}
+.heroes li:hover {
+  color: #607D8B;
+  color: rgb(0,120,215);
+  background-color: #DDD;
+  left: .1em;
+}
+.heroes li.selected:hover {
+  /*background-color: #BBD8DC !important;*/
+  color: white;
+}
+.heroes .text {
+  position: relative;
+  top: -3px;
+}
+.heroes .badge {
+  display: inline-block;
+  font-size: small;
+  color: white;
+  padding: 0.8em 0.7em 0 0.7em;
+  background-color: #607D8B;
+  background-color: rgb(0,120,215);
+  line-height: 1em;
+  position: relative;
+  left: -1px;
+  top: -4px;
+  height: 1.8em;
+  margin-right: .8em;
+  border-radius: 4px 0 0 4px;
+}
+button {
+  font-family: Arial;
+  background-color: #eee;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  cursor: hand;
+}
+button:hover {
+  background-color: #cfd8dc;
+}
+.error {color:red;}
+button.delete-button{
+  float:right;
+  background-color: gray !important;
+  background-color: rgb(216,59,1) !important;
+  color:white;
+}
+```
+
+あとは、main.moduleに今回のモジュールを追加して、ルータでURLとコンポーネントを関連づけることで表示が行えます。
+main.module.ts
+```JavaScript
+import { BrowserModule } from '@angular/platform-browser';
+import { NgModule } from '@angular/core';
+import { FormsModule } from '@angular/forms'; //テンプレートでバインディングしたり、validationするのに必要
+
+import { AppComponent } from 'index.component';
+import { HeroDetailComponent } from 'app/component/heroDetail/hero.detail.component';
+import { HeroListComponent } from 'app/component/heroList/hero.list.component';
+
+import { HeroService } from 'app/service/hero.service';
+import { AppRoutingModule } from 'app/router/app.router';
+
+@NgModule({
+  imports: [
+    AppRoutingModule, // 注意 ルータはdeclationではなくimportsにたす
+    BrowserModule,
+    FormsModule
+  ],
+  declarations: [
+    AppComponent,
+    HeroDetailComponent,
+    HeroListComponent
+  ],
+  providers: [
+    HeroService
+  ],
+  bootstrap: [AppComponent]
+})
+export class AppModule { }
+```
+app/router/app.router.ts
+```javascript
+import { NgModule } from '@angular/core';
+import { Routes, RouterModule } from '@angular/router';
+
+import { HeroDetailComponent } from 'app/component/heroDetail/hero.detail.component';
+import { HeroListComponent } from 'app/component/heroList/hero.list.component';
+
+// コンポーネントとURLを関連づける
+const routes: Routes = [
+  { path: '', redirectTo: '/list', pathMatch: 'full' },
+  { path: 'detail/:id', component: HeroDetailComponent },
+  { path: 'list', component: HeroListComponent }
+];
+
+@NgModule({
+  imports: [RouterModule.forRoot(routes)],
+  exports: [RouterModule]
+})
+export class AppRoutingModule { }
+```
