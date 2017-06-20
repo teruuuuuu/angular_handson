@@ -990,3 +990,118 @@ delete(id: number): Promise<void> {
 httpモジュールのpost、put、deleteを使い分けていますが違いは[ここ](https://stackoverflow.com/questions/24352106/difference-between-http-get-http-post-http-put-http-delete-http-head-a)のstackoverflowを確認するのが良さそうです。
 
 あとは各コンポーネントからサービスを利用するようにしたら、heroの名前変更が一覧に反映されたり、登録、削除が確認できるかと思います。
+
+### 検索を行ってみる
+サービスに検索用のリクエストを投げるメソッドを追加します。
+```javascript
+search(term: string): Observable<Hero[]> {
+  return this.http
+    .get(`app/heroes/?name=${term}`)
+    .map(response => response.json().data as Hero[]);
+}
+```
+レスポンスをそのままHero型の配列にセットするだけなので今までと同様にtoPromise()~で大丈夫かと思ったのですが、getリクエストの場合はtoPromiseが使えないようです。
+この辺りはrxjsとhttpモジュール周りの学習が必要になりそうです。
+それから以下のapp/component/heroSearch/hero.search.componentモジュールを追加してdashboardコンポーネントに配置すると検索コンポーネントが使えるようになります。
+app/component/search/hero.search.component.ts
+```javascript
+import { Component, OnInit } from '@angular/core';
+import { Router }            from '@angular/router';
+
+import { Observable }        from 'rxjs/Observable';
+import { Subject }           from 'rxjs/Subject';
+
+// Observable class extensions
+import 'rxjs/add/observable/of';
+
+// Observable operators
+import 'rxjs/add/operator/catch';
+import 'rxjs/add/operator/debounceTime';
+import 'rxjs/add/operator/distinctUntilChanged';
+import 'rxjs/add/operator/switchMap';
+
+import { HeroService } from 'app/service/hero.service';
+import { Hero } from 'app/model/Hero';
+
+@Component({
+  selector: 'hero-search',
+  templateUrl: './hero.search.component.html',
+  styleUrls: [ './hero.search.component.css' ],
+  providers: [HeroService]
+})
+export class HeroSearchComponent implements OnInit {
+  heroes: Observable<Hero[]>;
+  private searchTerms = new Subject<string>();
+
+  constructor(
+    private heroService: HeroService,
+    private router: Router) {}
+
+  // Push a search term into the observable stream.
+  search(term: string): void {
+    this.searchTerms.next(term);
+  }
+
+  ngOnInit(): void {
+    this.heroes = this.searchTerms
+      .debounceTime(300)        // wait 300ms after each keystroke before considering the term
+      .distinctUntilChanged()   // ignore if next search term is same as previous
+      .switchMap(term => term   // switch to new observable each time the term changes
+        // return the http search observable
+        ? this.heroService.search(term)
+        // or the observable of empty heroes if there was no search term
+        : Observable.of<Hero[]>([]))
+      .catch(error => {
+        // TODO: add real error handling
+        console.log(error);
+        return Observable.of<Hero[]>([]);
+      });
+  }
+
+  gotoDetail(hero: Hero): void {
+    let link = ['/detail', hero.id];
+    this.router.navigate(link);
+  }
+}
+```
+app/component/heroSearch/hero.search.comonent.html
+```html
+<div id="search-component">
+  <h4>Hero Search</h4>
+  <input #searchBox id="search-box" (keyup)="search(searchBox.value)" />
+  <div>
+    <div *ngFor="let hero of heroes | async"
+         (click)="gotoDetail(hero)" class="search-result" >
+      {{hero.name}}
+    </div>
+  </div>
+</div>
+```
+app/component/heroSearch/hero.search.component.css
+```css
+.search-result{
+  border-bottom: 1px solid gray;
+  border-left: 1px solid gray;
+  border-right: 1px solid gray;
+  width:195px;
+  height: 16px;
+  padding: 5px;
+  background-color: white;
+  cursor: pointer;
+}
+
+.search-result:hover {
+  color: #eee;
+  background-color: #607D8B;
+}
+
+#search-box{
+  width: 200px;
+  height: 20px;
+}
+```
+検索用のコンポーネントでは入力に変更があったらrxjsでサービスを呼び出すようにしています。angularのチュートリアルでrxjsが使われているので、angularをやるならrxjsを覚えていた方が良さそうに思いました。
+あとは今までと同様main.module.tsでモジュールを読み込むようにしダッシュボードコンポーネントに表示するようにして動作は確認できるかと思います。
+
+##　触ってみた感想
+Angularの1は触ったことがあったのですが、それに比べてだいぶ分かりやすくて扱いやすくなったと思います。特にルータ周りはReactと比べて優位に立ってそうな気がしました。

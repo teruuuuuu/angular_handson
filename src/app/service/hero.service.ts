@@ -7,6 +7,8 @@ import { HEROES } from 'app/mock/heros.mock';
 
 // WebAPIを呼んでデータ取得する際にtoPromiseを使用する
 import 'rxjs/add/operator/toPromise';
+import 'rxjs/add/operator/map';
+import { Observable }     from 'rxjs/Observable';
 
 @Injectable()
 export class HeroService {
@@ -78,6 +80,11 @@ export class HeroService {
       .catch(this.handleError);
   }
 
+  search(term: string): Observable<Hero[]> {
+    return this.http
+      .get(`app/heroes/?name=${term}`)
+      .map(response => response.json().data as Hero[]);
+  }
 
   // httpリクエスト失敗時の処理
   private handleError(error: any): Promise<any> {
