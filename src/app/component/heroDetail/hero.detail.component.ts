@@ -12,10 +12,10 @@ import { HeroService } from 'app/service/hero.service';
 export class HeroDetailComponent implements OnInit {
   // テンプレートhtmlにbindして使用するクラス変数
   title = 'HeroDetail';
-  @Input()  hero: Hero = new Hero();
+  @Input() hero: Hero = new Hero();
 
   // コンポーネントを使用する側で用途を決めれるようにする
-  @Input()  isSearchMode: Boolean = true;
+  @Input() isSearchMode: Boolean = true;
 
 
   constructor(
@@ -25,7 +25,7 @@ export class HeroDetailComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    if(this.isSearchMode){
+    if (this.isSearchMode) {
       // ルータからパラメータ取得
       this.route.params.forEach((params: Params) => {
         console.log("hero detail component ngOnInit");
@@ -33,7 +33,7 @@ export class HeroDetailComponent implements OnInit {
         if (params['id'] !== undefined) {
           const id = +params['id'];
           this.heroService.getHeroById(id)
-              .then(hero => this.hero = hero);
+            .then(hero => this.hero = hero);
         }
       });
     }
@@ -41,5 +41,10 @@ export class HeroDetailComponent implements OnInit {
 
   goBack(savedHero: Hero = null): void {
     window.history.back();
+  }
+
+  save(): void {
+    this.heroService.update(this.hero)
+      .then(() => this.goBack());
   }
 }

@@ -956,3 +956,37 @@ private handleError(error: any): Promise<any> {
 のようになっています。
 
 動かしてみると一覧表示をする際に毎回データを撮り直しているため、heroの名前を変更して一覧に戻ると変更が反映されないというのが確認できるかと思います。これまではサービスをコンポーネント間でのデータの共有として使っていたのですが、今回の修正でサービスをWebサーバに対してサービスを投げる用途で使うようにしたのでその違いはわかるようにしておきたいです。例えば共通のAPIで取得した結果を複数のコンポーネントで使うという必要があるのでしたら、サービスコンポーネント内にデータ保有用の変数を用意しておきWebAPIを呼び出した後はその変数を変更するようにする必要があるかと思います。
+
+### 追加、更新、削除のリクエストを投げれるようにしてみる
+サービス側に追加、更新、削除のリクエストを投げるメソッドを追加します。
+```javascript
+// angular-in-memory-web-apiのcreateApi呼び出し
+create(name: string): Promise<Hero> {
+  return this.http
+    .post(this.heroesUrl, JSON.stringify({ name: name }), { headers: this.headers })
+    .toPromise()
+    .then(res => res.json().data as Hero)
+    .catch(this.handleError);
+}
+
+// angular-in-memory-web-apiのupdateApi呼び出し
+update(hero: Hero): Promise<Hero> {
+  const url = `${this.heroesUrl}/${hero.id}`;
+  return this.http
+    .put(url, JSON.stringify(hero), { headers: this.headers })
+    .toPromise()
+    .then(() => hero)
+    .catch(this.handleError);
+}
+
+delete(id: number): Promise<void> {
+  const url = `${this.heroesUrl}/${id}`;
+  return this.http.delete(url, { headers: this.headers })
+    .toPromise()
+    .then(() => null)
+    .catch(this.handleError);
+}
+```
+httpモジュールのpost、put、deleteを使い分けていますが違いは[ここ](https://stackoverflow.com/questions/24352106/difference-between-http-get-http-post-http-put-http-delete-http-head-a)のstackoverflowを確認するのが良さそうです。
+
+あとは各コンポーネントからサービスを利用するようにしたら、heroの名前変更が一覧に反映されたり、登録、削除が確認できるかと思います。
