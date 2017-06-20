@@ -1,6 +1,11 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms'; //テンプレートでバインディングしたり、validationするのに必要
+import { HttpModule }    from '@angular/http'; // httpサービスを利用するのに必要
+
+// 今回はWebAPIのモックを使用する
+import { InMemoryWebApiModule } from 'angular-in-memory-web-api'; // npm install --save angular-in-memory-web-api
+import { InMemoryDataService }  from 'app/service/in-memory-data.service';
 
 import { AppComponent } from 'index.component';
 import { HeroDetailComponent } from 'app/component/heroDetail/hero.detail.component';
@@ -14,7 +19,9 @@ import { AppRoutingModule } from 'app/router/app.router';
   imports: [
     AppRoutingModule, // 注意 ルータはdeclationではなくimportsにたす
     BrowserModule,
-    FormsModule
+    FormsModule,
+    HttpModule,
+    InMemoryWebApiModule.forRoot(InMemoryDataService)
   ],
   declarations: [
     AppComponent,

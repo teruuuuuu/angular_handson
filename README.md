@@ -840,3 +840,119 @@ export class DashboardComponent implements OnInit {
 </div>
 ```
 あとはmain.module.tsでDashboardComponentを読み込むようにし、ルータに追加しておくと画面が表示されるようになります。
+
+### httpリクエストを投げれるようにしてみる
+次にhttpリクエストを投げれるようにしてみます。リクエストを受けるWEBサーバを準備するのは面倒なのでangularのモックを利用します。そのためにはmain.module.tsで以下のモジュールをインポートするようにします。
+```javascript
+import { InMemoryWebApiModule } from 'angular-in-memory-web-api'; // npm install --save angular-in-memory-web-api
+```
+"angular-in-memory-web-api"はangular本体に組み込まれていないので以下のコマンドでインストールしておきます。
+> npm install --save angular-in-memory-web-api
+
+それから、レスポンスとして返すデータを定義するapp/service/in-memory-data.service.tsを作成します。
+```javascript
+// angular-in-memory-web-apiで使うモックのapiの初期データ
+export class InMemoryDataService {
+  createDb() {
+    const heroes = [
+      { id: 1, name: 'one' },
+      { id: 11, name: 'Mr. Nice' },
+      { id: 12, name: 'Narco' },
+      { id: 13, name: 'Bombasto' },
+      { id: 14, name: 'Celeritas' },
+      { id: 15, name: 'Magneta' },
+      { id: 16, name: 'RubberMan' },
+      { id: 17, name: 'Dynama' },
+      { id: 18, name: 'Dr IQ' },
+      { id: 19, name: 'Magma' },
+      { id: 20, name: 'Tornado' }
+    ];
+    return { heroes };
+  }
+}
+```
+ここまで済んだらmain.module.tsを以下のように修正しWebAPIのモックを使用できるようにします。
+```javascript
+import { BrowserModule } from '@angular/platform-browser';
+import { NgModule } from '@angular/core';
+import { FormsModule } from '@angular/forms'; //テンプレートでバインディングしたり、validationするのに必要
+import { HttpModule }    from '@angular/http'; // httpサービスを利用するのに必要
+
+// 今回はWebAPIのモックを使用する
+import { InMemoryWebApiModule } from 'angular-in-memory-web-api'; // npm install --save angular-in-memory-web-api
+import { InMemoryDataService }  from 'app/service/in-memory-data.service';
+
+import { AppComponent } from 'index.component';
+import { HeroDetailComponent } from 'app/component/heroDetail/hero.detail.component';
+import { HeroListComponent } from 'app/component/heroList/hero.list.component';
+import { DashboardComponent } from 'app/component/dashboard/dashboard.component';
+
+import { HeroService } from 'app/service/hero.service';
+import { AppRoutingModule } from 'app/router/app.router';
+
+@NgModule({
+  imports: [
+    AppRoutingModule, // 注意 ルータはdeclationではなくimportsにたす
+    BrowserModule,
+    FormsModule,
+    HttpModule,
+    InMemoryWebApiModule.forRoot(InMemoryDataService)
+  ],
+  declarations: [
+    AppComponent,
+    HeroDetailComponent,
+    HeroListComponent,
+    DashboardComponent
+  ],
+  providers: [
+    HeroService
+  ],
+  bootstrap: [AppComponent]
+})
+export class AppModule { }
+```
+
+次にapp/service/hero.service.tsを修正しWebAPI経由でデータを取得するようにします。まず"angular/http"モジュールとrxjsのtoPromiseをインポートします。
+angular/httpのレスポンスはrxjsのtoPromiseで非同期で扱うのでrxjsのインポートも必要になります。
+```javascript
+import { Headers, Http, Response } from '@angular/http';
+import 'rxjs/add/operator/toPromise';
+```
+それからコンポーネント内のメッソッドを以下のように修正しWebAPI経由でデータを取得するように変更します。
+```javascript
+private heroesUrl = 'api/heroes';  // URL to web api
+private headers = new Headers({ 'Content-Type': 'application/json' });
+
+constructor(private http: Http) { }
+
+getHeroes(): Promise<Hero[]> {
+  console.log("hero service getHeros");
+  return this.http.get(this.heroesUrl)
+    .toPromise()
+    // jsonのレスポンスを受け取ってHero型の配列に変換する
+    .then(response => response.json().data as Hero[])
+    .catch(this.handleError);
+}
+
+getHeroById(id: number): Promise<Hero> {
+  const url = `${this.heroesUrl}/${id}`;
+  return this.http.get(url)
+    .toPromise()
+    .then(response => response.json().data as Hero)
+    .catch(this.handleError);
+}
+
+// httpリクエスト失敗時の処理
+private handleError(error: any): Promise<any> {
+  console.error('An error occurred', error);
+  return Promise.reject(error.message || error);
+}
+```
+今回はrxjsを使用していますがレスポンスのjsonをHero型の配列に変換するだけなので
+```javascript
+.toPromise()
+.then(response => response.json().data as Hero)
+```
+のようになっています。
+
+動かしてみると一覧表示をする際に毎回データを撮り直しているため、heroの名前を変更して一覧に戻ると変更が反映されないというのが確認できるかと思います。これまではサービスをコンポーネント間でのデータの共有として使っていたのですが、今回の修正でサービスをWebサーバに対してサービスを投げる用途で使うようにしたのでその違いはわかるようにしておきたいです。例えば共通のAPIで取得した結果を複数のコンポーネントで使うという必要があるのでしたら、サービスコンポーネント内にデータ保有用の変数を用意しておきWebAPIを呼び出した後はその変数を変更するようにする必要があるかと思います。
