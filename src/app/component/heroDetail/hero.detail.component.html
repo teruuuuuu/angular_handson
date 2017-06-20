@@ -6,7 +6,8 @@
   <div>
     <label>name: </label>
     <!-- 注意 ngMoelを使う場合はNgModuleでFormsModuleをインポートしないといけない-->
-    <input [(ngModel)]="hero.name" placeholder="name">
+    <input [(ngModel)]="hero.name" placeholder="name"><br />
+    <button (click)="goBack()">Back</button>
   </div>
 </div>
 

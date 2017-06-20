@@ -8,4 +8,13 @@
 </ul>
 
 <!-- コンポーネントのメンバ変数を[]で囲ったものに対して選択したheroを渡す -->
+<!--
 <hero-detail [hero]="selectedHero" [isSearchMode]="false"></hero-detail>
+-->
+
+<div *ngIf="selectedHero">
+  <h2>
+    {{selectedHero.name | uppercase}} is my hero
+  </h2>
+  <button (click)="gotoDetail()">View Details</button>
+</div>

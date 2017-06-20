@@ -733,3 +733,62 @@ export class HeroDetailComponent implements OnInit {
   }
 }
 ```
+
+### コンポーネント間で画面遷移してみる
+コンポーネント間で遷移できるようにするためまずapp/component/heroList/hero.list.component.tsに以下のメソッドを追加します。
+```javascript
+gotoDetail(): void {
+  this.router.navigate(['/detail', this.selectedHero.id]);
+}
+```
+それから、app/component/heroList/hero.list.component.htmlからgotoDetailを呼び出せるようにするため、以下のように修正します。
+```html
+<h1>{{title}}</h1>
+<h2>My Heroes</h2>
+<ul class="heroes">
+  <li *ngFor="let hero of heroes" (click)="onSelect(hero)" [class.selected]="hero === selectedHero">
+    <span class="hero-element">
+      <span class="badge">{{hero.id}}</span> {{hero.name}}</span>
+  </li>
+</ul>
+
+<!-- コンポーネントのメンバ変数を[]で囲ったものに対して選択したheroを渡す -->
+<!--
+<hero-detail [hero]="selectedHero" [isSearchMode]="false"></hero-detail>
+-->
+
+<div *ngIf="selectedHero">
+  <h2>
+    {{selectedHero.name | uppercase}} is my hero
+  </h2>
+  <button (click)="gotoDetail()">View Details</button>
+</div>
+```
+
+次にapp/compnent/heroDetail/hero.detail.compnentでは遷移元に戻れるように以下のメソッドを追加します。
+```
+goBack(savedHero: Hero = null): void {
+  window.history.back();
+}
+```
+それからapp/compnent/heroDetail/hero.detail.compnent.htmlから呼び出せるように以下のように修正します。
+```html
+<!-- heroが見つかった時のみこの部分を表示する-->
+<div *ngIf="hero">
+  <h1>{{title}}</h1>
+  <h2>{{hero.name}} details!</h2>
+  <div><label>id: </label>{{hero.id}}</div>
+  <div>
+    <label>name: </label>
+    <!-- 注意 ngMoelを使う場合はNgModuleでFormsModuleをインポートしないといけない-->
+    <input [(ngModel)]="hero.name" placeholder="name"><br />
+    <button (click)="goBack()">Back</button>
+  </div>
+</div>
+
+<!-- heroが見つからなかった場合の処理 -->
+<div *ngIf="!hero">
+  hero not found.
+</div>
+```
+これでコンポーネント間での画面繊維が確認できたかと思います。
