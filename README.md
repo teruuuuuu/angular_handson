@@ -1108,7 +1108,7 @@ Angularの1は触ったことがあったのですが、それに比べてだい
 
 
 ## スタイルガイド
-以下を参考にangular開発時のスタイルを決めておきた
+以下のangular開発時のスタイルガイドを参考にしたい  
 https://github.com/mgechev/angularjs-style-guide/blob/master/README-ja-jp.md
 
 ### routerとbootstrapをappディレクトリ直下のapp.jsに写す
@@ -1159,10 +1159,9 @@ export class AppComponent {}
 })
 ```
 
-### モジュール名はlowerCamelCaseで命名する
+### サブモジュールの名称
 ```
-モジュールはlowerCamelCaseで命名します。モジュール b がモジュール a のサブモジュールである場合、 a.b のようにネームスペースを利用してネストすることができます。
-
+モジュール b がモジュール a のサブモジュールである場合、 a.b のようにネームスペースを利用してネストすることができます。
 モジュールを構造化する方法は一般的に2つあります：
 
 機能性
@@ -1194,3 +1193,6 @@ export class AppComponent {}
         └── hero.search.ts
 ```
 サービス以下についてもどうするか決めておきたい
+
+### ディレクトリ名に複数の単語が含まれる場合はケバブケースを使用する
+ディレクティブとしてmy-textディレクトリにmyText.tsを追加した

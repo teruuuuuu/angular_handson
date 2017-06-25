@@ -12,6 +12,7 @@ import { HeroDetailComponent } from 'app/directives/hero/detail/hero.detail';
 import { HeroListComponent } from 'app/directives/hero/list/hero.list';
 import { HeroSearchComponent } from './app/directives/hero/search/hero.search';
 import { DashboardComponent } from 'app/directives/dashboard/dashboard';
+import { MyTextComponent } from 'app/directives/my-text/MyText';
 
 
 import { HeroService } from 'app/service/hero.service';
@@ -29,7 +30,8 @@ import { HeroService } from 'app/service/hero.service';
     HeroDetailComponent,
     HeroListComponent,
     DashboardComponent,
-    HeroSearchComponent
+    HeroSearchComponent,
+    MyTextComponent
   ],
   providers: [
     HeroService
