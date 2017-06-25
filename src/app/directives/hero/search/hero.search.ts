@@ -18,8 +18,8 @@ import { Hero } from 'app/model/Hero';
 
 @Component({
   selector: 'hero-search',
-  templateUrl: './hero.search.component.html',
-  styleUrls: [ './hero.search.component.css' ],
+  templateUrl: './hero.search.html',
+  styleUrls: [ './hero.search.css' ],
   providers: [HeroService]
 })
 export class HeroSearchComponent implements OnInit {

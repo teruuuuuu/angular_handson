@@ -1,9 +1,9 @@
 import { Component, NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 
-import { HeroDetailComponent } from 'app/component/heroDetail/hero.detail.component';
-import { HeroListComponent } from 'app/component/heroList/hero.list.component';
-import { DashboardComponent } from 'app/component/dashboard/dashboard.component';
+import { HeroDetailComponent } from 'app/directives/hero/detail/hero.detail';
+import { HeroListComponent } from 'app/directives/hero/list/hero.list';
+import { DashboardComponent } from 'app/directives/dashboard/dashboard';
 
 // コンポーネントとURLを関連づける
 const routes: Routes = [

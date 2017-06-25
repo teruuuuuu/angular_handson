@@ -1158,3 +1158,39 @@ export class AppComponent {}
   bootstrap: [AppComponent]
 })
 ```
+
+### モジュール名はlowerCamelCaseで命名する
+```
+モジュールはlowerCamelCaseで命名します。モジュール b がモジュール a のサブモジュールである場合、 a.b のようにネームスペースを利用してネストすることができます。
+
+モジュールを構造化する方法は一般的に2つあります：
+
+機能性
+コンポーネントタイプ
+今現在、2つに大きな違いはありませんが、1.の方法がより整って見えます。また、もし遅延ローディング・モジュールが実装されたら(AnglarJSのロードマップにはありませんが)、アプリケーションのパフォーマンスが向上するでしょう。
+```
+とのことらしい
+
+### ディレクトリ構造
+とりあえずディレクディブについては以下のようにしておいた
+```
+./directives
+├── dashboard
+│   ├── dashboard.css
+│   ├── dashboard.html
+│   └── dashboard.ts
+└── hero
+    ├── detail
+    │   ├── hero.detail.css
+    │   ├── hero.detail.html
+    │   └── hero.detail.ts
+    ├── list
+    │   ├── hero.list.css
+    │   ├── hero.list.html
+    │   └── hero.list.ts
+    └── search
+        ├── hero.search.css
+        ├── hero.search.html
+        └── hero.search.ts
+```
+サービス以下についてもどうするか決めておきたい

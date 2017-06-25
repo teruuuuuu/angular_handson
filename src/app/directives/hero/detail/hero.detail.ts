@@ -7,7 +7,7 @@ import { HeroService } from 'app/service/hero.service';
 
 @Component({
   selector: 'hero-detail', //ディレクティブのタグ名
-  templateUrl: './hero.detail.component.html' //htmlテンプレートの読み込み
+  templateUrl: './hero.detail.html' //htmlテンプレートの読み込み
 })
 export class HeroDetailComponent implements OnInit {
   // テンプレートhtmlにbindして使用するクラス変数
