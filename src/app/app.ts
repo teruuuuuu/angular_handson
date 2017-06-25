@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import { Component, NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 
 import { HeroDetailComponent } from 'app/component/heroDetail/hero.detail.component';
@@ -13,8 +13,13 @@ const routes: Routes = [
   { path: 'dashboard', component: DashboardComponent }
 ];
 
+@Component({
+  selector: 'app-root',
+  templateUrl: './app.html',
+  styleUrls: ['./app.css']
+})
 @NgModule({
   imports: [RouterModule.forRoot(routes)],
   exports: [RouterModule]
 })
-export class AppRoutingModule { }
+export class AppComponent {}

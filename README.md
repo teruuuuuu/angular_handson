@@ -1105,3 +1105,56 @@ app/component/heroSearch/hero.search.component.css
 
 ##　触ってみた感想
 Angularの1は触ったことがあったのですが、それに比べてだいぶ分かりやすくて扱いやすくなったと思います。特にルータ周りはReactと比べて優位に立ってそうな気がしました。
+
+
+## スタイルガイド
+以下を参考にangular開発時のスタイルを決めておきた
+https://github.com/mgechev/angularjs-style-guide/blob/master/README-ja-jp.md
+
+### routerとbootstrapをappディレクトリ直下のapp.jsに写す
+今までindex.component.tsとapp.router.tsで分けていたコンポーネントを一つにしてみる
+```javascript
+import { Component, NgModule } from '@angular/core';
+import { Routes, RouterModule } from '@angular/router';
+
+import { HeroDetailComponent } from 'app/component/heroDetail/hero.detail.component';
+import { HeroListComponent } from 'app/component/heroList/hero.list.component';
+import { DashboardComponent } from 'app/component/dashboard/dashboard.component';
+
+// コンポーネントとURLを関連づける
+const routes: Routes = [
+  { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
+  { path: 'detail/:id', component: HeroDetailComponent },
+  { path: 'list', component: HeroListComponent },
+  { path: 'dashboard', component: DashboardComponent }
+];
+
+@Component({
+  selector: 'app-root',
+  templateUrl: './app.html',
+  styleUrls: ['./app.css']
+})
+@NgModule({
+  imports: [RouterModule.forRoot(routes)],
+  exports: [RouterModule]
+})
+export class AppComponent {}
+```
+
+その場合はmain.module.tsの@NgModule内でimportsとdeclarationsそれからbootstrapにコンポーネントを追加する。作ったコンポーネントの中で一番最初に動くっていうのがイメージがつきそうな気がする。
+```javascript
+@NgModule({
+  imports: [
+    AppComponent,
+~~~
+  ],
+  declarations: [
+    AppComponent,
+~~~
+  ],
+  providers: [
+    HeroService
+  ],
+  bootstrap: [AppComponent]
+})
+```
