@@ -7,6 +7,8 @@
     <label>name: </label>
     <!-- 注意 ngMoelを使う場合はNgModuleでFormsModuleをインポートしないといけない-->
     <input [(ngModel)]="hero.name" placeholder="name"><br />
+    <!-- カスタムディレクティブであたいの変更をそのまま代入するようにする-->
+    <my-text [(textInput)]="hero.name" placeHolder="name"></my-text><br />
     <button (click)="goBack()">Back</button>
     <button (click)="save()">Save</button>
   </div>

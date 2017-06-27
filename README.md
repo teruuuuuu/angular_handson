@@ -1103,6 +1103,124 @@ app/component/heroSearch/hero.search.component.css
 検索用のコンポーネントでは入力に変更があったらrxjsでサービスを呼び出すようにしています。angularのチュートリアルでrxjsが使われているので、angularをやるならrxjsを覚えていた方が良さそうに思いました。
 あとは今までと同様main.module.tsでモジュールを読み込むようにしダッシュボードコンポーネントに表示するようにして動作は確認できるかと思います。
 
+## コンポーネント内のメンバ変数の変更を監視する
+例えばコンポーネント内に以下のメンバ変数があったとします。
+```javascript
+@Input() textInput: String = "";
+```
+このメンバ変数は親のコンポーネントから直接値を変更されることがあるため、値が変更されたタイミングに実行したメソッド等ある場合は監視が必要になりそうですが、以下のように@Inputで監視対象の変数を指定することで変更された際に何をするか指定することができます。
+
+```javascript
+@Input('textInput')
+set updateInternalVal(externalVal) {
+  this.textInput = externalVal;
+  this.onEditChange();
+}
+```
+
+## 自作のカスタムディレクティブに対して双方向バインディングしてみる
+inputタグなど元からhtmlに存在しているタグであればng-modelでバインドすることでinputへの入力がバインドしている変数に直接反映されるし、バインドしている変数自体を変更することでバインド先へのinputタグの表示が切り替わる双方向バインドが働いてますが、Angular2以降では自作のディレクティブに対しての双方向バインドが廃止されたようでちょっと工夫が必要なようでした。   
+以下自分が試した方法になります。
+
+### Outputを受け取る際に変数を変更する
+例えば以下のコンポーネントがあったとします。
+myText.html
+```html
+<input [(ngModel)]="textInput" (ngModelChange)="onEditChange()" placeholder="{{ placeHolder }}"/> {{ textLength }}
+```
+
+myText.ts
+```javascript
+import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Router }            from '@angular/router';
+
+import { Observable }        from 'rxjs/Observable';
+import { Subject }           from 'rxjs/Subject';
+
+
+@Component({
+  selector: 'my-text',
+  templateUrl: './myText.html',
+  styleUrls: [ './myText.css' ]
+})
+export class MyTextComponent {
+  @Input() textInput: String = "";
+  @Input() placeHolder: String = "";
+
+  textLength: Number = 0;
+
+  @Output() textChange = new EventEmitter<String>();
+
+  // 親コンポーネントからの値の変更時に実行
+  @Input('textInput')
+  set updateInternalVal(externalVal) {
+    this.textInput = externalVal;
+    this.onEditChange();
+  }
+
+  onEditChange(): void {
+    if(this.textInput !== void 0 && this.textInput.length !== void 0){
+      this.textLength = this.textInput.length;
+    }
+    this.textChange.emit(this.textInput);
+  }
+}
+```
+このコンポーネントはメンバ変数textInputに親からバインドしているものがセットされているのですが、コンポーネント内で変数の値が変更されたことを親へ伝えるのには以下のようにカスタムのイベントを発行しています。
+```javascript
+this.textChange.emit(this.textInput);
+```
+その場合、呼び出し元の親コンポーネントは以下のようにtextChangeのイベントを受け取った際にバインド先の変数を変更することで双方向バインドの動きになります。
+```html
+<my-text [(textInput)]="hero.name" (textChange)="hero.name = $event" placeHolder="name"></my-text><br />
+```
+
+### Outputのカスタムイベント名を"メンバ変数 + Change"にすることで自動で双方向バインドする
+さっきの方法だと親コンポーネント側で双方向バインドするか選べましたが、こっちの方は子コンポーネントの方で直接双方向バインドするように指定できます。
+まず子コンポーネント側でカスタムイベントの名称を"メンバ変数 + Change"に指定し、値に変更があったらemitするようにします。
+myText.ts
+```javascript
+import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Router }            from '@angular/router';
+
+import { Observable }        from 'rxjs/Observable';
+import { Subject }           from 'rxjs/Subject';
+
+
+@Component({
+  selector: 'my-text',
+  templateUrl: './myText.html',
+  styleUrls: [ './myText.css' ]
+})
+export class MyTextComponent {
+  @Input() textInput: String = "";
+  @Input() placeHolder: String = "";
+
+  textLength: Number = 0;
+
+  @Output() textInputChange = new EventEmitter<String>();
+
+  // 親コンポーネントからの値の変更時に実行
+  @Input('textInput')
+  set updateInternalVal(externalVal) {
+    this.textInput = externalVal;
+    this.onEditChange();
+  }
+
+  onEditChange(): void {
+    if(this.textInput !== void 0 && this.textInput.length !== void 0){
+      this.textLength = this.textInput.length;
+    }
+    this.textInputChange.emit(this.textInput);
+  }
+}
+```
+
+この場合は、イベントが発行された時に何をするとか特に指定しなくても双方向バインドが実現されます。以下呼び出し元のサンプルになります。
+```html
+<my-text [(textInput)]="hero.name" placeHolder="name"></my-text><br />
+```
+
 ##　触ってみた感想
 Angularの1は触ったことがあったのですが、それに比べてだいぶ分かりやすくて扱いやすくなったと思います。特にルータ周りはReactと比べて優位に立ってそうな気がしました。
 

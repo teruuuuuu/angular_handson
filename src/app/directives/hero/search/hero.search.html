@@ -1,7 +1,7 @@
 <div id="search-component">
   <h4>Hero Search</h4>
   <!-- textInputは子コンポーネントに渡して、textChangeからイベントを受けっとってsearchメソッドを呼び出すようにしている -->
-  <my-text [textInput]="textInput" (textChange)="search($event)"></my-text>
+  <my-text [textInput]="textInput" (textInputChange)="search($event)"></my-text>
   <div>
     <div *ngFor="let hero of heroes | async"
          (click)="gotoDetail(hero)" class="search-result" >

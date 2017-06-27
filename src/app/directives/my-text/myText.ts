@@ -12,12 +12,23 @@ import { Subject }           from 'rxjs/Subject';
 })
 export class MyTextComponent {
   @Input() textInput: String = "";
+  @Input() placeHolder: String = "";
+
   textLength: Number = 0;
 
-  @Output() textChange = new EventEmitter<String>();
+  @Output() textInputChange = new EventEmitter<String>();
+
+  // 親コンポーネントからの値の変更時に実行
+  @Input('textInput')
+  set updateInternalVal(externalVal) {
+    this.textInput = externalVal;
+    this.onEditChange();
+  }
 
   onEditChange(): void {
-    this.textLength = this.textInput.length;
-    this.textChange.emit(this.textInput);
+    if(this.textInput !== void 0 && this.textInput.length !== void 0){
+      this.textLength = this.textInput.length;
+    }
+    this.textInputChange.emit(this.textInput);
   }
 }
