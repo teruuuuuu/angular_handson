@@ -2,7 +2,10 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 
 import { Hero } from 'app/model/Hero';
-import { HeroService } from 'app/service/hero.service';
+import { HeroService } from 'app/service/hero/hero.service';
+
+import { HeroStore } from 'app/store/hero.store';
+import { Observable } from "rxjs";
 
 @Component({
   selector: 'my-dashboard',
@@ -14,12 +17,15 @@ export class DashboardComponent implements OnInit {
 
   constructor(
     private router: Router,
-    private heroService: HeroService) {
+    private heroService: HeroService,
+    private heroStore: HeroStore) {
   }
 
   ngOnInit(): void {
-    this.heroService.getHeroes()
-      .then(heroes => this.heroes = heroes.slice(1, 6));
+    this.heroService.setHeroStore();
+    this.heroStore.heros.subscribe(
+      heroes => this.heroes = heroes.slice(0, 6)
+    );
   }
 
   gotoDetail(hero: Hero): void {

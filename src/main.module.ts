@@ -15,7 +15,8 @@ import { DashboardComponent } from 'app/directives/dashboard/dashboard';
 import { MyTextComponent } from 'app/directives/my-text/MyText';
 
 
-import { HeroService } from 'app/service/hero.service';
+import { HeroService } from 'app/service/hero/hero.service';
+import { HeroStore } from 'app/store/hero.store';
 
 @NgModule({
   imports: [
@@ -34,7 +35,8 @@ import { HeroService } from 'app/service/hero.service';
     MyTextComponent
   ],
   providers: [
-    HeroService
+    HeroService,
+    HeroStore
   ],
   bootstrap: [AppComponent]
 })

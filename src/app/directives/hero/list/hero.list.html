@@ -4,7 +4,7 @@
   <li *ngFor="let hero of heroes" (click)="onSelect(hero)" [class.selected]="hero === selectedHero">
     <span class="hero-element">
       <span class="badge">{{hero.id}}</span>
-      <span class="name">{{hero.name}}</span> 
+      <span class="name">{{hero.name}}</span>
       <button class="delete-button" (click)="delete(hero, $event)">Delete</button>
     </span>
   </li>
@@ -24,7 +24,5 @@
 
 <div>
   <label>Hero name:</label> <input #heroName />
-  <button (click)="add(heroName.value); heroName.value=''">
-    Add
-  </button>
+  <button (click)="add(heroName.value); heroName.value=''">Add</button>
 </div>

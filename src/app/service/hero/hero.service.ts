@@ -10,15 +10,22 @@ import 'rxjs/add/operator/toPromise';
 import 'rxjs/add/operator/map';
 import { Observable }     from 'rxjs/Observable';
 
+import { HeroStore } from 'app/store/hero.store';
+
 @Injectable()
 export class HeroService {
   // angular-in-memory-web-apiで呼び出すAPIのベースURL
   private heroesUrl = 'api/heroes';  // URL to web api
   private headers = new Headers({ 'Content-Type': 'application/json' });
 
-  constructor(private http: Http) { }
+  constructor(private http: Http, private heroStore: HeroStore) { }
 
-
+  setHeroStore(): void {
+    this.getHeroes()
+      .then(heroes =>
+        this.heroStore.setHeros(heroes)
+      );
+  }
 
   getHeroes(): Promise<Hero[]> {
     console.log("hero service getHeros");
@@ -29,7 +36,9 @@ export class HeroService {
     return this.http.get(this.heroesUrl)
       .toPromise()
       // jsonのレスポンスを受け取ってHero型の配列に変換する
-      .then(response => response.json().data as Hero[])
+      .then(response =>
+        response.json().data as Hero[]
+      )
       .catch(this.handleError);
   }
 

@@ -2,8 +2,10 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 
 import { Hero } from 'app/model/Hero';
-import { HeroService } from 'app/service/hero.service';
+import { HeroService } from 'app/service/hero/hero.service';
 
+import { HeroStore } from 'app/store/hero.store';
+import { Observable } from "rxjs";
 
 @Component({
   selector: 'hero-list',
@@ -12,24 +14,23 @@ import { HeroService } from 'app/service/hero.service';
 })
 export class HeroListComponent implements OnInit {
   heroes: Hero[] = [];
+
   title = 'HeroesList';
   selectedHero: Hero;
 
   // サービスはconstructorに足しておく
   constructor(
     private router: Router,
-    private heroService: HeroService) {
-  }
+    private heroService: HeroService,
+    private heroStore: HeroStore) {}
 
   ngOnInit(): void {
     // 再描画のたびに呼ばれるので、ここでメンバ変数を初期化
     console.log("HeroListComponent ngOnInit")
-    this.heroService.getHeroes()
-      .then(heroes => this.heroes = heroes);
-    /*
-    this.heroService.getHeroesSlowly()
-      .then(heroes => this.heroes = heroes);
-      */
+    this.heroService.setHeroStore();
+    this.heroStore.heros.subscribe(
+      heroes => this.heroes = heroes
+    );
   }
 
   onSelect(hero: Hero): void {
@@ -58,5 +59,4 @@ export class HeroListComponent implements OnInit {
         if (this.selectedHero === hero) { this.selectedHero = null; }
       });
   }
-
 }

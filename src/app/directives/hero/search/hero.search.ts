@@ -13,7 +13,7 @@ import 'rxjs/add/operator/debounceTime';
 import 'rxjs/add/operator/distinctUntilChanged';
 import 'rxjs/add/operator/switchMap';
 
-import { HeroService } from 'app/service/hero.service';
+import { HeroService } from 'app/service/hero/hero.service';
 import { Hero } from 'app/model/Hero';
 
 @Component({

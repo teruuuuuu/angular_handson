@@ -2,8 +2,9 @@ import { Component, Input, OnInit } from '@angular/core';
 import { ActivatedRoute, Params } from '@angular/router';
 
 import { Hero } from 'app/model/Hero';
-import { HeroService } from 'app/service/hero.service';
+import { HeroService } from 'app/service/hero/hero.service';
 
+import {Observable} from "rxjs/Observable";
 
 @Component({
   selector: 'hero-detail', //ディレクティブのタグ名
