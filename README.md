@@ -1221,6 +1221,85 @@ export class MyTextComponent {
 <my-text [(textInput)]="hero.name" placeHolder="name"></my-text><br />
 ```
 
+### BehaviorSubjectを使って簡単なstoreを実装して見る
+今まではサービスを利用する時はPromiseを返していたのですが、それだとただのメソッドで結果はサービスの呼び出し元のみに取得されます。そこで、サービスの結果を他のコンポーネントで利用する時にどう共有すれば良いのかが課題になるかと思います。
+その場合は、RxJSのBehaviorSubjectを利用することでデータを管理するstoreを実現し他のコンポーネント間でもデータを共有できるようにします。
+まず以下のようにデータのstoreを実装します。
+```javascript
+
+import {Injectable} from "@angular/core";
+import {Observable} from "rxjs/Observable";
+import {Subject} from "rxjs/Subject";
+
+import {BehaviorSubject} from "rxjs/Rx";
+
+import { Hero } from 'app/model/Hero';
+
+@Injectable()
+export class HeroStore {
+
+    private _heros: BehaviorSubject<Hero[]> = new BehaviorSubject([]);
+
+    constructor() {}
+
+    setHeros(heros: Hero[]): void{
+      this._heros.next(heros)
+    }
+
+    get heros(): Observable<Hero[]> {
+        return this.asObservable(this._heros);
+    }
+
+    asObservable(subject: BehaviorSubject<Hero[]>) {
+        return new Observable(fn => subject.subscribe(fn));
+    }
+}
+```
+
+それから、storeを利用する場合は以下のようになります。
+ここでは"this.heroStore.heros.subscribe(heroes => this.heroes = heroes.slice(0, 6));"
+のところでstoreで保持されている値を共有するようにしています。
+
+
+```javascript
+import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
+
+import { Hero } from 'app/model/Hero';
+import { HeroService } from 'app/service/hero/hero.service';
+
+import { HeroStore } from 'app/store/hero.store';
+import { Observable } from "rxjs";
+
+@Component({
+  selector: 'my-dashboard',
+  templateUrl: './dashboard.html',
+  styleUrls: ['./dashboard.css']
+})
+export class DashboardComponent implements OnInit {
+  heroes: Hero[] = [];
+
+  constructor(
+    private router: Router,
+    private heroService: HeroService,
+    private heroStore: HeroStore) {
+  }
+
+  ngOnInit(): void {
+    this.heroService.setHeroStore();
+    this.heroStore.heros.subscribe(
+      heroes => this.heroes = heroes.slice(0, 6)
+    );
+  }
+
+  gotoDetail(hero: Hero): void {
+    const link = ['/detail', hero.id];
+    this.router.navigate(link);
+  }
+}
+```
+
+
 ##　触ってみた感想
 Angularの1は触ったことがあったのですが、それに比べてだいぶ分かりやすくて扱いやすくなったと思います。特にルータ周りはReactと比べて優位に立ってそうな気がしました。
 
