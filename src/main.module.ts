@@ -12,11 +12,11 @@ import { HeroDetailComponent } from 'app/directives/hero/detail/hero.detail';
 import { HeroListComponent } from 'app/directives/hero/list/hero.list';
 import { HeroSearchComponent } from './app/directives/hero/search/hero.search';
 import { DashboardComponent } from 'app/directives/dashboard/dashboard';
-import { MyTextComponent } from 'app/directives/my-text/MyText';
+import { MyTextComponent } from 'app/directives/parts/my-text/MyText';
 
-
+import { HeroAction } from 'app/action/hero/hero.action'
 import { HeroService } from 'app/service/hero/hero.service';
-import { HeroStore } from 'app/store/hero.store';
+import { HeroStore } from 'app/store/hero/hero.store';
 
 @NgModule({
   imports: [
@@ -35,6 +35,7 @@ import { HeroStore } from 'app/store/hero.store';
     MyTextComponent
   ],
   providers: [
+    HeroAction,
     HeroService,
     HeroStore
   ],

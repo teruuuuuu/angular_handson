@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { Headers, Http, Response } from '@angular/http';
 
-import { Hero } from 'app/model/Hero';
-import { HEROES } from 'app/mock/heros.mock';
+import { Hero } from 'app/model/hero/hero';
+import { HEROES } from 'app/mock/hero/heros.mock';
 
 
 // WebAPIを呼んでデータ取得する際にtoPromiseを使用する
@@ -10,29 +10,16 @@ import 'rxjs/add/operator/toPromise';
 import 'rxjs/add/operator/map';
 import { Observable }     from 'rxjs/Observable';
 
-import { HeroStore } from 'app/store/hero.store';
-
 @Injectable()
 export class HeroService {
   // angular-in-memory-web-apiで呼び出すAPIのベースURL
   private heroesUrl = 'api/heroes';  // URL to web api
   private headers = new Headers({ 'Content-Type': 'application/json' });
 
-  constructor(private http: Http, private heroStore: HeroStore) { }
+  constructor(private http: Http) { }
 
-  setHeroStore(): void {
-    this.getHeroes()
-      .then(heroes =>
-        this.heroStore.setHeros(heroes)
-      );
-  }
 
   getHeroes(): Promise<Hero[]> {
-    console.log("hero service getHeros");
-    /*
-    console.info(HEROES); // 2wayバインドによりmockオブジェクト自体が変更されていることが確認できる
-    return Promise.resolve(HEROES);
-    */
     return this.http.get(this.heroesUrl)
       .toPromise()
       // jsonのレスポンスを受け取ってHero型の配列に変換する

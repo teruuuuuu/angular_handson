@@ -14,7 +14,7 @@ import 'rxjs/add/operator/distinctUntilChanged';
 import 'rxjs/add/operator/switchMap';
 
 import { HeroService } from 'app/service/hero/hero.service';
-import { Hero } from 'app/model/Hero';
+import { Hero } from 'app/model/hero/hero';
 
 @Component({
   selector: 'hero-search',
