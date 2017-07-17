@@ -1,0 +1,70 @@
+import {
+  async, ComponentFixture, fakeAsync, inject, TestBed, tick//, ComponentFixtureAutoDetect
+} from '@angular/core/testing';
+
+import { By }           from '@angular/platform-browser';
+import { DebugElement } from '@angular/core';
+
+
+import { Hero } from 'app/model/hero/hero';
+import { HeroDetailComponent } from 'app/directives/hero/detail/hero.detail';
+import { HeroService } from 'app/service/hero/hero.service';
+
+
+////// Testing Vars //////
+let comp: HeroDetailComponent;
+let fixture: ComponentFixture<HeroDetailComponent>;
+//let de: DebugElement;
+//let el: HTMLElement;
+
+/*
+// 各Spec(個々のテスト)が開始される前に行う処理を設定する。
+// 非同期処理
+// Componentのインスタンスを生成する前に、Angular template compilerが外部ファイルを読み込む
+beforeEach(async(() => {
+  // テストしたいクラスのためのモジュール環境をconfigureTestingModuleメソッドで設定する。
+  // メタデータの登録
+  TestBed.configureTestingModule({
+    // テストされるComponentを登録
+    declarations: [
+      HeroDetailComponent
+    ],
+    providers: [
+      {provide: ComponentFixtureAutoDetect, useValue: true}
+    ]
+  }).compileComponents(); // 外部ファイルをコンパイル
+
+}));
+*/
+////// Tests //////
+/*
+describe('HeroDetailComponent', () => {
+  beforeEach(() => {
+    //activatedRoute = new ActivatedRouteStub();
+  });
+  //describe('with HeroModule setup', heroModuleSetup);
+  describe('when override its provided HeroDetailService', overrideSetup);
+  //describe('with FormsModule setup', formsModuleSetup);
+  //describe('with SharedModule setup', sharedModuleSetup);
+});
+
+
+function overrideSetup() {
+  class HeroDetailServiceSpy {
+    testHero:Hero = new Hero(42, 'Test Hero');
+
+    getHero = jasmine.createSpy('getHero').and.callFake(
+      () => Promise
+        .resolve(true)
+        .then(() => Object.assign({}, this.testHero))
+    );
+
+    saveHero = jasmine.createSpy('saveHero').and.callFake(
+      (hero: Hero) => Promise
+        .resolve(true)
+        .then(() => Object.assign(this.testHero, hero))
+    );
+  }
+
+}
+*/
