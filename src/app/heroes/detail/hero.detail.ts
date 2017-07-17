@@ -1,8 +1,8 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { ActivatedRoute, Params } from '@angular/router';
 
-import { Hero } from 'app/model/hero/hero';
-import { HeroService } from 'app/service/hero/hero.service';
+import { Hero } from 'app/heroes/model/hero';
+import { HeroService } from 'app/heroes/service/hero.service';
 
 import {Observable} from "rxjs/Observable";
 

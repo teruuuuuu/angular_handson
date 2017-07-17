@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { Headers, Http, Response } from '@angular/http';
 
-import { Hero } from 'app/model/hero/hero';
-import { HEROES } from 'app/mock/hero/heros.mock';
+import { Hero } from 'app/heroes/model/hero';
+//import { HEROES } from 'app/mock/hero/heros.mock';
 
 
 // WebAPIを呼んでデータ取得する際にtoPromiseを使用する

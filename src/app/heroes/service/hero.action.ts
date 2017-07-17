@@ -1,14 +1,12 @@
 import { Injectable } from '@angular/core';
 
-import { Hero } from 'app/model/hero/hero';
-import { HEROES } from 'app/mock/hero/heros.mock';
-
+import { Hero } from 'app/heroes/model/hero';
 
 import 'rxjs/add/operator/toPromise';
 import 'rxjs/add/operator/map';
 import { Observable }     from 'rxjs/Observable';
 
-import { HeroService } from 'app/service/hero/hero.service';
+import { HeroService } from './hero.service';
 import { HeroStore } from 'app/store/hero/hero.store';
 
 @Injectable()

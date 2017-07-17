@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 
-import { Hero } from 'app/model/hero/hero';
-import { HeroAction } from 'app/action/hero/hero.action';
+import { Hero } from 'app/heroes/model/hero';
+import { HeroAction } from 'app/heroes/service/hero.action';
 import { HeroStore } from 'app/store/hero/hero.store';
 import { Observable } from "rxjs";
 
@@ -21,6 +21,7 @@ export class DashboardComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    console.log("dashboard init");
     this.heroAction.dataInit();
     this.heroStore.heros.subscribe(
       heroes => this.heroes = heroes.slice(0, 6)
@@ -28,7 +29,7 @@ export class DashboardComponent implements OnInit {
   }
 
   gotoDetail(hero: Hero): void {
-    const link = ['/detail', hero.id];
+    const link = ['heroes/detail', hero.id];
     this.router.navigate(link);
   }
 }

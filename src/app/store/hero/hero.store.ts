@@ -5,7 +5,7 @@ import {Subject} from "rxjs/Subject";
 
 import {BehaviorSubject} from "rxjs/Rx";
 
-import { Hero } from 'app/model/hero/hero';
+import { Hero } from 'app/heroes/model/hero';
 
 @Injectable()
 export class HeroStore {

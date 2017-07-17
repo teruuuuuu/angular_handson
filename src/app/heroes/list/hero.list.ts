@@ -1,11 +1,11 @@
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 
 import { Observable } from "rxjs";
 
-import { Hero } from 'app/model/hero/hero';
-import { HeroAction } from 'app/action/hero/hero.action';
-import { HeroService } from 'app/service/hero/hero.service';
+import { Hero } from 'app/heroes/model/hero';
+import { HeroAction } from 'app/heroes/service/hero.action';
+import { HeroService } from 'app/heroes/service/hero.service';
 import { HeroStore } from 'app/store/hero/hero.store';
 
 @Component({
@@ -22,6 +22,7 @@ export class HeroListComponent implements OnInit {
   // サービスはconstructorに足しておく
   constructor(
     private router: Router,
+    private route: ActivatedRoute,
     private heroAction: HeroAction,
     private heroService: HeroService,
     private heroStore: HeroStore) {}
@@ -40,7 +41,7 @@ export class HeroListComponent implements OnInit {
   }
 
   gotoDetail(): void {
-    this.router.navigate(['/detail', this.selectedHero.id]);
+    this.router.navigate(['./detail', this.selectedHero.id], {relativeTo: this.route});
   }
 
   add(name: string): void {
