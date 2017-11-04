@@ -76,11 +76,12 @@ export class HeroService {
       .catch(this.handleError);
   }
 
-  search(term: string): Observable<Hero[]> {
-    return this.http
-      .get(`app/heroes/?name=${term}`)
-      .map(response => response.json().data as Hero[]);
-  }
+  // search(term: string): Observable<Hero[]> {
+  //   return this.http
+  //     .get(`app/heroes/?name=${term}`)
+  //     .map(response => response.json().data as Hero[]);
+  //
+  // }
 
   // httpリクエスト失敗時の処理
   private handleError(error: any): Promise<any> {

@@ -15,6 +15,7 @@ import 'rxjs/add/operator/switchMap';
 
 import { HeroService } from 'app/heroes/service/hero.service';
 import { Hero } from 'app/heroes/model/hero';
+import { HeroStore } from 'app/store/hero/hero.store';
 
 @Component({
   selector: 'hero-search',
@@ -23,21 +24,37 @@ import { Hero } from 'app/heroes/model/hero';
   providers: [HeroService]
 })
 export class HeroSearchComponent implements OnInit {
-  heroes: Observable<Hero[]>;
+  // heroes: Observable<Hero[]>;
+  all_heroes: Hero[] = [];
+  search_heroes: Hero[] = [];
+
+
   private searchTerms = new Subject<string>();
 
   textInput: string = "";
 
   constructor(
     private heroService: HeroService,
-    private router: Router) {}
+    private router: Router,
+    private heroStore: HeroStore) {}
+
 
   // Push a search term into the observable stream.
   search(term: string): void {
-    this.searchTerms.next(term);
+    if(term.trim() == ""){
+      this.search_heroes = [];
+    }else{
+      this.search_heroes = this.all_heroes.filter(h => h.name.search(term) >= 0);
+    }
+    // console.info(this.heroes);
+    // this.searchTerms.next(term);
   }
 
   ngOnInit(): void {
+    this.heroStore.heros.subscribe(
+      heroes => this.all_heroes = heroes
+    );
+    /*　ストアから取り出すように修正する
     this.heroes = this.searchTerms
       .debounceTime(300)        // wait 300ms after each keystroke before considering the term
       .distinctUntilChanged()   // ignore if next search term is same as previous
@@ -51,6 +68,7 @@ export class HeroSearchComponent implements OnInit {
         console.log(error);
         return Observable.of<Hero[]>([]);
       });
+      */
   }
 
   gotoDetail(hero: Hero): void {

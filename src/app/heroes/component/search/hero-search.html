@@ -3,7 +3,7 @@
   <!-- textInputは子コンポーネントに渡して、textChangeからイベントを受けっとってsearchメソッドを呼び出すようにしている -->
   <my-text [textInput]="textInput" (textInputChange)="search($event)"></my-text>
   <div>
-    <div *ngFor="let hero of heroes | async"
+    <div *ngFor="let hero of search_heroes"
          (click)="gotoDetail(hero)" class="search-result" >
       {{hero.name}}
     </div>

@@ -4,7 +4,7 @@ import { Routes, RouterModule } from '@angular/router';
 // コンポーネントとURLを関連づける
 const routes: Routes = [
   { path: '', redirectTo: 'dashboard', pathMatch: 'full'},
-  { path: 'heroes', loadChildren: 'app/heroes/heroes.module#HeroesModule'},
+  { path: 'heroes', loadChildren: 'app/heroes/module/heroes.module#HeroesModule'},
   { path: 'dashboard', loadChildren: 'app/dashboard/dashboard.module#DashboardModule'}
 ];
 

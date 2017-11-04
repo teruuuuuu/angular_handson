@@ -3,7 +3,7 @@ import { CommonModule }  from '@angular/common'; // BrowserModule has already be
 import { FormsModule }   from '@angular/forms';
 
 import { SharedModule } from 'app/shared/shared.module';
-import { HeroSearchComponent } from './search/hero-search';
+import { HeroSearchComponent } from '../component/search/hero-search';
 
 @NgModule({
   imports:      [ CommonModule, FormsModule, SharedModule ],
